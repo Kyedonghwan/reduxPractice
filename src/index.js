@@ -1,17 +1,74 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import { createStore } from 'redux';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+const input = document.getElementById("input");
+const form = document.querySelector("form");
+const ul = document.querySelector("ul");
+const CREATE_TODO = 'create_todo';
+const DELETE_TODO = 'delete_todo';
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+const reducer = (state=[], action) => {
+  switch(action.type) {
+    case CREATE_TODO:
+      return [{text: action.payload, id:Date.now()} ,...state]
+    case DELETE_TODO:
+      return state.filter(toDo => toDo.id !== action.payload)
+    default:
+      return state;
+  }
+}
+
+const createAction = (toDo) => {
+  return {
+    type: CREATE_TODO,
+    payload: toDo
+  }
+}
+
+const deleteAction = (id) => {
+  return {
+    type: DELETE_TODO,
+    payload: id
+  }
+}
+
+//Action
+
+const dispatchCreateToDo = (toDo) => {
+  store.dispatch(createAction(toDo));
+}
+
+const dispatchDeleteToDo = (id) => {
+  store.dispatch(deleteAction(id));
+}
+
+//Action Creator;
+
+const paintToDo = () => {
+  const toDos = store.getState();
+  ul.innerHTML = "";
+  toDos.map((toDo) => {
+    const li = document.createElement("li");
+    const button = document.createElement("button");
+    li.innerHTML = toDo.text;
+    li.id = toDo.id;
+    button.innerHTML = "DELETE";
+    button.addEventListener("click", (e)=> {
+      dispatchDeleteToDo(parseInt(e.target.parentNode.id));
+    })
+    ul.appendChild(li);
+    li.appendChild(button);
+  });
+}
+
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const toDo = input.value;
+  input.value = "";
+  dispatchCreateToDo(toDo);
+})
+
+const store = createStore(reducer);
+
+store.subscribe(paintToDo);
+//store 저장될때마다 실행 됨
+
