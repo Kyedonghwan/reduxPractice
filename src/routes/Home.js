@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { actionCreateToDo } from '../actions';
 import ToDo from '../components/ToDo';
+import PropTypes from 'prop-types';
 
 function Home({ toDos, createToDo}) {
   const [text, setText] = useState("");
@@ -23,9 +24,14 @@ function Home({ toDos, createToDo}) {
         <input type="text" value={text} onChange={onChange}/>
         <button>Add</button>
       </form>
-      <ul>{toDos.map(toDo => <ToDo key={toDo.id} {...toDo} />)}</ul>
+      <ul>{toDos.map(toDo => (<ToDo key={toDo.id} text={toDo.text} id={toDo.id} />))}</ul>
     </>
   )
+}
+
+Home.propTypes = {
+  toDos: PropTypes.array,
+  createToDo: PropTypes.func
 }
 
 function mapStateToProps(state) {
